@@ -24,12 +24,10 @@ def write_permanent_vehicle_positions(file_path: str, df: pd.DataFrame):
 
 
 def combine_vehicle_position_files(file_name: str, file_path: str):
-    new_df = pd.read_parquet(file_path)
+    combined_df = new_df = pd.read_parquet(file_path)
     permanent_file_path = f'data/vehicle_positions/vilnius/{file_name}'
 
-    if not path.exists(permanent_file_path):
-        write_permanent_vehicle_positions(file_path, new_df)
-    else:
+    if path.exists(permanent_file_path):
         previous_df = pd.read_parquet(file_path)
         combined_df = pd.concat([previous_df, new_df], axis=0) \
             .sort_values(by=['MatavimoLaikas', 'Gauta']) \
@@ -44,7 +42,7 @@ def combine_vehicle_position_files(file_name: str, file_path: str):
             ]
         )
 
-        write_permanent_vehicle_positions(file_path, combined_df)
+    write_permanent_vehicle_positions(permanent_file_path, combined_df)
 
 
 def combine_vehicle_position_files_in_directory():
