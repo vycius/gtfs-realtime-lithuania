@@ -1,4 +1,3 @@
-import shutil
 from os import listdir, path
 
 import pandas as pd
@@ -50,8 +49,6 @@ def combine_vehicle_position_files_in_directory():
 
         if path.isfile(file_path):
             combine_vehicle_position_files(filename, file_path)
-
-    shutil.rmtree(temp_directory)
 
 
 if __name__ == '__main__':
