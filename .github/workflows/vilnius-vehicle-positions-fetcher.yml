@@ -6,7 +6,8 @@ on:
     - cron: '0 * * * *'
 
 jobs:
-  build:
+  fetch:
+    name: 'Fetch Vilnius vehicle positions'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
