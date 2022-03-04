@@ -26,10 +26,15 @@ def fetch_vehicle_positions_df() -> pd.DataFrame:
         dtype={
             'Transportas': pd.CategoricalDtype(),
             'Marsrutas': pd.StringDtype(),
-            'MasinosNumeris': pd.StringDtype(),
             'ReisoID': pd.Int64Dtype(),
-            'NuokrypisSekundemis': pd.Int64Dtype(),
+            'MasinosNumeris': pd.StringDtype(),
+            'Ilguma': pd.Int64Dtype(),
+            'Platuma': pd.Int64Dtype(),
+            'Greitis': pd.Int64Dtype(),
+            'Azimutas': pd.Int64Dtype(),
             'ReisoPradziaMinutemis': pd.Int64Dtype(),
+            'NuokrypisSekundemis': pd.Int64Dtype(),
+            'MatavimoLaikas': pd.Int64Dtype(),
             'MasinosTipas': pd.CategoricalDtype(),
         }
     )
