@@ -9,6 +9,7 @@ def fetch_vehicle_positions_df() -> pd.DataFrame:
     df = pd.read_csv(
         'http://www.stops.lt/vilnius/gps_full.txt',
         engine='pyarrow',
+        on_bad_lines='warn',
         usecols=[
             'Transportas',
             'Marsrutas',
