@@ -30,7 +30,6 @@ def combine_vehicle_position_files(file_name: str, file_path: str):
     if path.exists(permanent_file_path):
         previous_df = pd.read_parquet(file_path)
         combined_df = pd.concat([previous_df, new_df], axis=0) \
-            .sort_values(by=['MatavimoLaikas', 'Gauta']) \
             .drop_duplicates(
             subset=[
                 'Transportas',
