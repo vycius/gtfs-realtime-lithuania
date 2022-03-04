@@ -109,7 +109,7 @@ def fetch_vehicle_positions():
     file_date = (started_at - timedelta(hours=3, minutes=59)).date().isoformat()
 
     os.makedirs('data/temp', exist_ok=True)
-    df_vehicle_positions.to_parquet(f'data/temp/{file_date}.parquet')
+    df_vehicle_positions.to_parquet(f'data/temp/{file_date}.parquet', index=False)
 
 
 if __name__ == '__main__':
