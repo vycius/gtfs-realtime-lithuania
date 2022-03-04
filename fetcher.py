@@ -8,6 +8,7 @@ import pandas as pd
 def fetch_vehicle_positions_df() -> pd.DataFrame:
     df = pd.read_csv(
         'http://www.stops.lt/vilnius/gps_full.txt',
+        engine='pyarrow',
         usecols=[
             'Transportas',
             'Marsrutas',
@@ -23,7 +24,7 @@ def fetch_vehicle_positions_df() -> pd.DataFrame:
             'MasinosTipas',
         ],
         dtype={
-            'Transportas': pd.StringDtype(),
+            'Transportas': pd.CategoricalDtype(),
             'Marsrutas': pd.StringDtype(),
             'MasinosNumeris': pd.StringDtype(),
             'ReisoID': pd.Int64Dtype(),
@@ -33,8 +34,8 @@ def fetch_vehicle_positions_df() -> pd.DataFrame:
         }
     )
 
-    df['Lat'] = df['Platuma'] / 1000000
-    df['Lon'] = df['Ilguma'] / 1000000
+    df['Platuma'] = df['Platuma'] / 1000000
+    df['Ilguma'] = df['Ilguma'] / 1000000
 
     return df
 
