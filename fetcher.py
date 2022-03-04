@@ -1,48 +1,76 @@
 import os
 import time
 from datetime import datetime, timedelta
+from io import StringIO
 
 import pandas as pd
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
+
+usecols_dict = {
+    'vilnius': [
+        'Transportas',
+        'Marsrutas',
+        'ReisoID',
+        'MasinosNumeris',
+        'Ilguma',
+        'Platuma',
+        'Greitis',
+        'Azimutas',
+        'ReisoPradziaMinutemis',
+        'NuokrypisSekundemis',
+        'MatavimoLaikas',
+        'MasinosTipas',
+    ]
+}
+
+dtype_dict = {
+    'vilnius': {
+        'Transportas': pd.CategoricalDtype(),
+        'Marsrutas': pd.StringDtype(),
+        'ReisoID': pd.Int64Dtype(),
+        'MasinosNumeris': pd.StringDtype(),
+        'Ilguma': pd.Int64Dtype(),
+        'Platuma': pd.Int64Dtype(),
+        'Greitis': pd.Int64Dtype(),
+        'Azimutas': pd.Int64Dtype(),
+        'ReisoPradziaMinutemis': pd.Int64Dtype(),
+        'NuokrypisSekundemis': pd.Int64Dtype(),
+        'MatavimoLaikas': pd.Int64Dtype(),
+        'MasinosTipas': pd.CategoricalDtype(),
+    }
+}
 
 
-def fetch_vehicle_positions_df() -> pd.DataFrame:
-    df = pd.read_csv(
-        'http://www.stops.lt/vilnius/gps_full.txt',
-        on_bad_lines='warn',
-        usecols=[
-            'Transportas',
-            'Marsrutas',
-            'ReisoID',
-            'MasinosNumeris',
-            'Ilguma',
-            'Platuma',
-            'Greitis',
-            'Azimutas',
-            'ReisoPradziaMinutemis',
-            'NuokrypisSekundemis',
-            'MatavimoLaikas',
-            'MasinosTipas',
-        ],
-        dtype={
-            'Transportas': pd.CategoricalDtype(),
-            'Marsrutas': pd.StringDtype(),
-            'ReisoID': pd.Int64Dtype(),
-            'MasinosNumeris': pd.StringDtype(),
-            'Ilguma': pd.Int64Dtype(),
-            'Platuma': pd.Int64Dtype(),
-            'Greitis': pd.Int64Dtype(),
-            'Azimutas': pd.Int64Dtype(),
-            'ReisoPradziaMinutemis': pd.Int64Dtype(),
-            'NuokrypisSekundemis': pd.Int64Dtype(),
-            'MatavimoLaikas': pd.Int64Dtype(),
-            'MasinosTipas': pd.CategoricalDtype(),
-        }
-    )
+def fetch_vehicle_positions_df(city: str = 'vilnius') -> pd.DataFrame:
+    url = f'http://www.stops.lt/{city}/gps_full.txt'
+    usecols = usecols_dict[city]
+    dtype = dtype_dict[city]
 
-    df['Platuma'] = df['Platuma'] / 1000000
-    df['Ilguma'] = df['Ilguma'] / 1000000
+    with requests.Session() as s:
+        retries = Retry(
+            total=10,
+            backoff_factor=0.2,
+            status_forcelist=[500, 502, 503, 504])
 
-    return df
+        s.mount('http://', HTTPAdapter(max_retries=retries))
+        s.mount('https://', HTTPAdapter(max_retries=retries))
+
+        r = s.get(url)
+
+        # noinspection PyTypeChecker
+        df = pd.read_csv(
+            StringIO(r.text),
+            on_bad_lines='warn',
+            usecols=usecols,
+            dtype=dtype,
+        )
+
+        df['Platuma'] = df['Platuma'] / 1000000
+        df['Ilguma'] = df['Ilguma'] / 1000000
+
+        return df
 
 
 def parse_and_listen_for_vehicle_positions(started_at: datetime) -> pd.DataFrame:
