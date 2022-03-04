@@ -42,7 +42,7 @@ def fetch_vehicle_positions_df() -> pd.DataFrame:
 def parse_and_listen_for_vehicle_positions(started_at: datetime) -> pd.DataFrame:
     df_unique_vehicle_positions = None
 
-    while datetime.now() - started_at < timedelta(hours=1, minutes=10):
+    while datetime.now() - started_at < timedelta(minutes=2):
         fetched_at = int(datetime.timestamp(datetime.now()))
         df_new_vehicle_positions = fetch_vehicle_positions_df()
 
