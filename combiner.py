@@ -22,12 +22,12 @@ def write_permanent_vehicle_positions(file_path: str, df: pd.DataFrame):
     print(sorted_df.info())
 
 
-def combine_vehicle_position_files(file_name: str, file_path: str):
-    combined_df = new_df = pd.read_parquet(file_path)
+def combine_vehicle_position_files(file_name: str, temporary_file_path: str):
+    combined_df = new_df = pd.read_parquet(temporary_file_path)
     permanent_file_path = f'data/vehicle_positions/vilnius/{file_name}'
 
     if path.exists(permanent_file_path):
-        previous_df = pd.read_parquet(file_path)
+        previous_df = pd.read_parquet(permanent_file_path)
         combined_df = pd.concat([previous_df, new_df], axis=0) \
             .drop_duplicates(
             subset=[
