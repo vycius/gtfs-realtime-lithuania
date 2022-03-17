@@ -1,10 +1,12 @@
 import os
+import sys
 import time
 from datetime import datetime, timedelta
 from io import StringIO
 
 import pandas as pd
 import requests
+from pandas.errors import EmptyDataError
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
@@ -78,7 +80,12 @@ def parse_and_listen_for_vehicle_positions(started_at: datetime) -> pd.DataFrame
 
     while datetime.now() - started_at < timedelta(hours=1, minutes=10):
         fetched_at = int(datetime.timestamp(datetime.now()))
-        df_new_vehicle_positions = fetch_vehicle_positions_df()
+        try:
+            df_new_vehicle_positions = fetch_vehicle_positions_df()
+        except EmptyDataError as ex:
+            print(ex, file=sys.stderr)
+            time.sleep(3)
+            continue
 
         df_new_vehicle_positions['Gauta'] = fetched_at
 
