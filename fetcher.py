@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 from datetime import datetime, timedelta
 from io import StringIO
@@ -83,7 +82,7 @@ def parse_and_listen_for_vehicle_positions(started_at: datetime) -> pd.DataFrame
         try:
             df_new_vehicle_positions = fetch_vehicle_positions_df()
         except EmptyDataError as ex:
-            print(ex, file=sys.stderr)
+            print(ex)
             time.sleep(3)
             continue
 
