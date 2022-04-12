@@ -44,7 +44,7 @@ dtype_dict = {
 }
 
 
-def fetch_vehicle_positions_df(city: str = 'vilnius') -> pd.DataFrame:
+def fetch_vehicle_positions_df(city: str = 'vilnius', retries_left: int = 3) -> pd.DataFrame:
     url = f'http://www.stops.lt/{city}/gps_full.txt'
     usecols = usecols_dict[city]
     dtype = dtype_dict[city]
@@ -60,13 +60,21 @@ def fetch_vehicle_positions_df(city: str = 'vilnius') -> pd.DataFrame:
 
         r = s.get(url)
 
-        # noinspection PyTypeChecker
-        df = pd.read_csv(
-            StringIO(r.text),
-            on_bad_lines='warn',
-            usecols=usecols,
-            dtype=dtype,
-        )
+        try:
+            # noinspection PyTypeChecker
+            df = pd.read_csv(
+                StringIO(r.text),
+                on_bad_lines='warn',
+                usecols=usecols,
+                dtype=dtype,
+            )
+        # Guard against bad data e.g. ValueError: Unable to parse string "Z" at position 446
+        except ValueError as ex:
+            if retries_left == 0:
+                raise ex
+
+            time.sleep(3)
+            return fetch_vehicle_positions_df(city, retries_left=retries_left - 1)
 
         df['Platuma'] = df['Platuma'] / 1000000
         df['Ilguma'] = df['Ilguma'] / 1000000
