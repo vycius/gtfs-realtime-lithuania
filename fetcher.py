@@ -30,7 +30,7 @@ dtype_dict = {
     'vilnius': {
         'Transportas': pd.CategoricalDtype(),
         'Marsrutas': pd.StringDtype(),
-        'ReisoID': pd.Int64Dtype(),
+        'ReisoID': pd.StringDtype(),
         'MasinosNumeris': pd.StringDtype(),
         'Ilguma': pd.Int64Dtype(),
         'Platuma': pd.Int64Dtype(),
@@ -45,7 +45,7 @@ dtype_dict = {
 
 
 def fetch_vehicle_positions_df(city: str = 'vilnius', retries_left: int = 3) -> pd.DataFrame:
-    url = f'http://www.stops.lt/{city}/gps_full.txt'
+    url = f'http://www.stops.lt/{city}/gps_full_v2.txt'
     usecols = usecols_dict[city]
     dtype = dtype_dict[city]
 
